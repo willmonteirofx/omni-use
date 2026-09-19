@@ -1,206 +1,206 @@
-# 🖥️ Omni-Use (Local Desktop Computer Use)
+# 🖥️ Omni-Use: Local Desktop Computer Use Agent
 
-> **Agente Autônomo de Computer Use 100% Local para Windows**  
-> Controle inteligente do mouse e teclado através de visão computacional, LLMs locais com quantização e OCR multilíngue em tempo real.
+> **100% Local Autonomous Computer Use Agent for Windows**  
+> Intelligent mouse and keyboard automation powered by computer vision, quantized local LLMs/VLMs, and real-time multilingual OCR.
 
 ---
 
-## 📌 Visão Geral
+## 📌 Overview
 
-O **Omni-Use** é uma plataforma de automação e controle autônomo do ambiente Windows (*Computer Use*) que roda **100% localmente** na máquina do usuário, sem necessidade de enviar dados, capturas de tela ou credenciais para servidores de terceiros.
+**Omni-Use** is an autonomous desktop automation platform (*Computer Use*) that runs **100% locally** on Windows workstations. No screenshots, credentials, or user data are ever uploaded to cloud servers or third-party APIs.
 
-Diferente de automações baseadas apenas em DOM de navegadores, o Omni-Use analisa a tela física por meio de **visão computacional híbrida (OmniParser V2)**, identifica caixas delimitadoras e elementos interativos, processa a decisão por meio de **modelos locais de linguagem e visão (Qwen via llama.cpp)** e interage de forma segura e fluida via **Win32 SendInput**.
+Unlike browser-only automation tools limited to DOM trees, Omni-Use analyzes physical desktop screens through **hybrid computer vision (OmniParser V2)**, detects interactable UI elements and bounding boxes, reasons over decisions with **local language and vision models (Qwen via llama.cpp)**, and drives the operating system natively and safely using **Win32 SendInput**.
 
 ```
    ┌────────────────────────────────────────────────────────┐
    │                     Desktop Screen                     │
    └───────────────────────────┬────────────────────────────┘
-                               │ (mss captura rápida)
+                               │ (Fast screen capture via mss)
                                ▼
    ┌────────────────────────────────────────────────────────┐
    │                    OmniParser V2                       │
-   │  - YOLOv8 (Detecção de Ícones & Elementos)             │
-   │  - Florence-2 (Captioning Semântico de Ícones)         │
-   │  - EasyOCR / PaddleOCR (Extração de Textos PT/EN)      │
+   │  - YOLOv8 (Icon & UI Element Detection)                │
+   │  - Florence-2 (Semantic Icon Captioning)               │
+   │  - EasyOCR / PaddleOCR (PT / EN Text Recognition)      │
    └───────────────────────────┬────────────────────────────┘
-                               │ [id] tipo "texto" @ (x, y) + imagem anotada
+                               │ [id] type "text" @ (x, y) + labeled image
                                ▼
    ┌────────────────────────────────────────────────────────┐
-   │                 LLM / VLM Local (llama.cpp)            │
+   │                 Local LLM / VLM (llama.cpp)            │
    │  - Qwen 3.5 / 2.5 (4B / 9B Instruct + Vision mmproj)   │
-   │  - Geração de Ação estruturada em JSON                 │
+   │  - Structured JSON Action Proposal                     │
    └───────────────────────────┬────────────────────────────┘
-                               │ Proposta de ação
+                               │ Proposed action
                                ▼
    ┌────────────────────────────────────────────────────────┐
    │             OpenJev decide() Safety Gate               │
-   │  - Verificação probabilística de ações destrutivas     │
-   │  - Validação de término da tarefa ("done")             │
+   │  - Logit probability check for destructive actions     │
+   │  - Semantic validation of task completion ("done")     │
    └───────────────────────────┬────────────────────────────┘
-                               │ Ação aprovada
+                               │ Approved action
                                ▼
    ┌────────────────────────────────────────────────────────┐
    │               Win32 Control & Mouse Guard              │
-   │  - SendInput com curvas de interpolação natural        │
-   │  - Interrupção imediata por movimento manual (Guard)   │
+   │  - SendInput with natural curved glide trajectory      │
+   │  - Instant pause on human mouse takeover (Low-level)   │
    └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Principais Funcionalidades
+## 🚀 Key Features
 
-- 👁️ **Visão Computacional Local (OmniParser V2):** Detecta elementos clicáveis, botões, campos de texto e ícones sem depender de acessibilidade ou código-fonte da aplicação alvo.
-- 🧠 **Raciocínio com LLMs Locais:** Integração nativa com `llama-server` (CUDA 12.4), suportando modelos Qwen com e sem projetor de visão (`mmproj`).
-- 🛡️ **Segurança Ativa & Mouse Guard:**
-  - **Detecção de Conflito:** Se o usuário mexer o mouse manualmente por 1 segundo, o agente pausa automaticamente, cedendo o controle.
-  - **Safety Gate (`decide`):** Ações com potencial destrutivo (apagar, enviar, comprar, fechar sem salvar) são pausadas e aguardam aprovação explícita.
-- 🪟 **Interface Minimalista e Flutuante (Tauri v2):** Barra flutuante translúcida com entrada de comando, controle de pausa/retomada e badge animado no cursor.
-- 🎯 **Modo de Confinamento (`OMNI_CONFINE_TITLE`):** Possibilidade de restringir cliques e digitações exclusivamente a uma janela específica durante testes e integrações.
-- 🎙️ **Comando de Voz Integrado:** Suporte a transcrição local por voz via `whisper.cpp` (`large-v3-turbo`).
+- 👁️ **Local Computer Vision (OmniParser V2):** Accurately identifies buttons, icons, and input fields across any Windows application without requiring accessibility trees or source code.
+- 🧠 **Local LLM/VLM Reasoning:** Native GPU-accelerated execution via `llama-server` (CUDA 12.4), supporting Qwen text and multimodal vision projectors (`mmproj`).
+- 🛡️ **Active Safety & Mouse Guard:**
+  - **Human Conflict Detection:** Moving the mouse manually for 1 second instantly pauses the agent, yielding control back to the user.
+  - **Destructive Action Gate (`decide`):** High-risk actions (e.g., delete, close without saving, send, purchase) require explicit user approval.
+- 🪟 **Floating Lightweight UI (Tauri v2):** Minimalist translucent command bar, status indicators, and an animated cursor badge excluded from screen capture (`WDA_EXCLUDEFROMCAPTURE`).
+- 🎯 **Target Window Confinement (`OMNI_CONFINE_TITLE`):** Ability to restrict all clicks, typing, and keystrokes exclusively to a specific window during testing.
+- 🎙️ **Local Voice Input:** Fast offline speech-to-text integration powered by `whisper.cpp` (`large-v3-turbo`).
 
 ---
 
-## 🧩 Arquitetura do Projeto
+## 🧩 Project Architecture
 
 ```
 omni-use/
-├── agent/                  # Sidecar Python (Agente Core)
-│   ├── core.py             # Loop principal de Computer Use, Safety Gate & Execução
-│   ├── vision.py           # Captura de tela, parsing de coordenadas e OCR
-│   ├── control.py          # Emulação de mouse/teclado via Win32 SendInput
-│   ├── llm_client.py       # Cliente HTTP para o llama.cpp (Chat, Vision & decide)
-│   ├── server.py           # Servidor HTTP local (porta 8766) para comunicação com a Shell
-│   └── config.py           # Constantes, portas e variáveis de ambiente
-├── omniparser/             # Submódulo oficial Microsoft OmniParser
-├── shell/                  # Shell Desktop nativo em Rust (Tauri v2)
-│   ├── src/main.rs         # Gerenciador de janelas, ciclo de vida e subprocessos
-│   ├── src/guard.rs        # Low-level Windows Mouse Hook (detecção de controle humano)
-│   ├── src/llm.rs          # Gerenciamento do ciclo de vida do llama-server
-│   └── src/voice.rs        # Integração de áudio e streaming do whisper.cpp
-├── ui/                     # Interface gráfica do usuário (HTML5, CSS3, Vanilla JS)
-│   ├── index.html/script.js# Barra flutuante de comandos e status
-│   └── badge.html          # Indicador visual próximo ao cursor durante execução
-├── scripts/                # Automação de setup, download de modelos e compilação
-├── requirements.txt        # Dependências Python do agente
+├── agent/                  # Python Sidecar (Core Agent Engine)
+│   ├── core.py             # Main Computer Use loop, Safety Gate & Action execution
+│   ├── vision.py           # Screen capture, OCR extraction, and OmniParser parsing
+│   ├── control.py          # Mouse & keyboard emulation via Win32 SendInput
+│   ├── llm_client.py       # HTTP client for llama.cpp (Chat, Vision & decide)
+│   ├── server.py           # Local HTTP server (port 8766) communicating with the Shell
+│   └── config.py           # Configuration, ports, and environment variables
+├── omniparser/             # Official Microsoft OmniParser submodule
+├── shell/                  # Native Rust Desktop Shell (Tauri v2)
+│   ├── src/main.rs         # Window management, process lifecycle, and background orchestration
+│   ├── src/guard.rs        # Low-level Windows Mouse Hook (detects human intervention)
+│   ├── src/llm.rs          # llama-server background process manager
+│   └── src/voice.rs        # Audio capture and whisper.cpp streaming
+├── ui/                     # Web Frontend (HTML5, CSS3, Vanilla JS)
+│   ├── index.html/script.js# Floating prompt bar and action status
+│   └── badge.html          # Non-intrusive cursor badge indicator
+├── scripts/                # Automated batch scripts for setup, models, and builds
+├── requirements.txt        # Python agent dependencies
 └── README.md
 ```
 
 ---
 
-## 🤖 Modelos e Engines Utilizados & Créditos
+## 🤖 Models, Engines & Credits
 
-O Omni-Use integra diversas tecnologias de ponta do ecossistema Open Source e de Inteligência Artificial:
+Omni-Use builds upon state-of-the-art open-source AI models and native runtime engines:
 
-| Componente | Função | Criador / Repositório | Licença Original |
+| Component | Role | Creator / Source | Original License |
 | :--- | :--- | :--- | :--- |
-| **OmniParser V2** | Parser de UI de tela | [Microsoft Research](https://github.com/microsoft/OmniParser) | MIT |
-| **Florence-2** | Captioning e descrição de ícones | [Microsoft](https://huggingface.co/microsoft/Florence-2-base) | MIT |
-| **YOLOv8** (Detector) | Detecção de caixas delimitadoras | [Ultralytics](https://github.com/ultralytics/ultralytics) | AGPL-3.0 / Commercial |
-| **Qwen 2.5 / 3.5** | Raciocínio, tomada de decisão e VLM | [Alibaba Cloud / Qwen Team](https://github.com/QwenLM/Qwen2.5) | Apache 2.0 / Qwen License |
-| **llama.cpp** | Inferência LLM/VLM acelerada por GPU | [Georgi Gerganov & Comunidade](https://github.com/ggml-org/llama.cpp) | MIT |
-| **whisper.cpp** | Reconhecimento de fala local ultrarrápido | [Georgi Gerganov](https://github.com/ggml-org/whisper.cpp) / [OpenAI](https://github.com/openai/whisper) | MIT |
-| **EasyOCR** | Reconhecimento Óptico de Caracteres | [JaidedAI](https://github.com/JaidedAI/EasyOCR) | Apache 2.0 |
-| **PaddleOCR** | Motor OCR e Deep Learning | [PaddlePaddle / Baidu](https://github.com/PaddlePaddle/PaddleOCR) | Apache 2.0 |
-| **Tauri v2** | Framework para aplicação Desktop leve | [Tauri Apps](https://tauri.app/) | MIT / Apache 2.0 |
+| **OmniParser V2** | Screen UI parsing & parsing pipeline | [Microsoft Research](https://github.com/microsoft/OmniParser) | MIT |
+| **Florence-2** | Semantic icon captioning | [Microsoft](https://huggingface.co/microsoft/Florence-2-base) | MIT |
+| **YOLOv8** (Detector) | Bounding box icon detector | [Ultralytics](https://github.com/ultralytics/ultralytics) | AGPL-3.0 / Commercial |
+| **Qwen 2.5 / 3.5** | Instruction following, reasoning & VLM | [Alibaba Cloud / Qwen Team](https://github.com/QwenLM/Qwen2.5) | Apache 2.0 / Qwen License |
+| **llama.cpp** | High-performance GPU LLM/VLM inference | [Georgi Gerganov & Community](https://github.com/ggml-org/llama.cpp) | MIT |
+| **whisper.cpp** | Ultra-fast local voice transcription | [Georgi Gerganov](https://github.com/ggml-org/whisper.cpp) / [OpenAI](https://github.com/openai/whisper) | MIT |
+| **EasyOCR** | Optical Character Recognition engine | [JaidedAI](https://github.com/JaidedAI/EasyOCR) | Apache 2.0 |
+| **PaddleOCR** | Deep learning OCR framework | [PaddlePaddle / Baidu](https://github.com/PaddlePaddle/PaddleOCR) | Apache 2.0 |
+| **Tauri v2** | Lightweight desktop application shell | [Tauri Apps](https://tauri.app/) | MIT / Apache 2.0 |
 
 ---
 
-## ⚖️ Licenciamento & Diretrizes Comerciais
+## ⚖️ Licensing & Commercialization Guidelines
 
-O código-fonte do **Omni-Use** está licenciado sob a licença **[MIT](LICENSE)**.
+The core codebase of **Omni-Use** is released under the **[MIT License](LICENSE)**.
 
-### 💼 Considerações para Monetização, Nuvem e Serviços Proprietários:
+### 💼 Commercial, Cloud & Open-Source Guidelines:
 
-1. **Uso Aberto e Contribuições da Comunidade:**
-   - O projeto é 100% aberto para a comunidade clonar, estudar, corrigir bugs e submeter Pull Requests.
-2. **Engines Permissivas (MIT / Apache 2.0):**
-   - A vasta maioria dos componentes (Tauri, llama.cpp, Whisper, Florence-2, EasyOCR, PaddleOCR, Qwen) possui licenças extremamente permissivas que permitem uso comercial, distribuição e hospedagem em nuvem.
-3. **Atenção ao Componente YOLO (Ultralytics AGPL-3.0):**
-   - O OmniParser V2 utiliza internamente modelos treinados com o framework `ultralytics`. Sob a licença **AGPL-3.0**, caso você ofereça o serviço via rede/SaaS ou faça distribuições fechadas com modificações sem disponibilizar o código-fonte, aplicam-se os termos da AGPL-3.0.
-   - **Para monetização e SaaS comercial em larga escala**, você pode:
-     - *(Opção A)* Manter o core do agente sob licença aberta (como este repositório).
-     - *(Opção B)* Adquirir a Licença Comercial Enterprise junto à Ultralytics.
-     - *(Opção C)* Substituir o detector de ícones por arquiteturas sob Apache 2.0/MIT (como RT-DETR, DETR ou YOLOv10/YOLOv11 com pesos independentes).
-
----
-
-## 🛠️ Requisitos de Sistema
-
-- **Sistema Operacional:** Windows 10 ou Windows 11 (64-bit).
-- **GPU (Recomendado):** Placa de vídeo NVIDIA com suporte a **CUDA 12.4+** e no mínimo **8 GB de VRAM** (12 GB+ para execução simultânea do VLM de 9B e OmniParser).
-- **Python:** Versão **3.12** instalada e configurada no `PATH`.
-- **Rust & Cargo:** Para compilação da Shell Tauri ([rustup.rs](https://rustup.rs/)).
-- **Visual Studio C++ Build Tools:** C++ CMake e MSVC v143+.
+1. **Open-Source & Community Contributions:**
+   - The project is fully open for community forks, bug fixes, enhancements, and custom integrations.
+2. **Permissive Upstream Engines (MIT / Apache 2.0):**
+   - The majority of underlying components (Tauri, llama.cpp, Whisper, Florence-2, EasyOCR, PaddleOCR, Qwen) use highly permissive licenses suitable for commercial products, cloud hosting, and SaaS infrastructure.
+3. **Ultralytics YOLO (AGPL-3.0) Notice:**
+   - Microsoft OmniParser V2 relies on `ultralytics` for its icon detector. Under the **AGPL-3.0** license, if you host a modified backend service or distribute closed-source binaries over a network, AGPL copyleft terms may apply.
+   - **For enterprise commercialization or closed-source cloud backends**, you can:
+     - *(Option A)* Keep your agent core open-source (as structured in this repository).
+     - *(Option B)* Obtain an Enterprise Commercial License directly from Ultralytics.
+     - *(Option C)* Replace the icon detector module with Apache 2.0 / MIT models (e.g., RT-DETR or DETR architectures).
 
 ---
 
-## 📦 Guia de Instalação
+## 🛠️ System Requirements
 
-Abra um terminal (PowerShell ou Command Prompt) na raiz do projeto:
+- **Operating System:** Windows 10 or Windows 11 (64-bit).
+- **GPU (Recommended):** NVIDIA GPU with **CUDA 12.4+** support and at least **8 GB VRAM** (12 GB+ recommended for running 9B VLMs concurrently with OmniParser).
+- **Python:** Version **3.12** available on system `PATH`.
+- **Rust & Cargo:** For compiling the Tauri desktop shell ([rustup.rs](https://rustup.rs/)).
+- **Visual Studio C++ Build Tools:** C++ CMake and MSVC v143+ tools.
 
-### 1. Clonar o Repositório e Submódulos
+---
+
+## 📦 Step-by-Step Installation
+
+Open a terminal (PowerShell or Command Prompt) in your desired directory:
+
+### 1. Clone the Repository and Submodules
 ```powershell
 git clone --recurse-submodules https://github.com/willmonteirofx/omni-use.git
 cd omni-use
 ```
 
-*(Se já clonou sem o flag de submódulo, execute `git submodule update --init --recursive`)*
+*(If cloned without submodules, run: `git submodule update --init --recursive`)*
 
-### 2. Instalar o Ambiente do Agente (Python)
-Cria o ambiente virtual `agent/.venv` com PyTorch CUDA 12.4 e todas as dependências:
+### 2. Install the Python Agent Environment
+Creates the virtual environment at `agent/.venv` with PyTorch CUDA 12.4 and all required dependencies:
 ```cmd
 scripts\install_agent.bat
 ```
 
-### 3. Baixar os Pesos do OmniParser V2
-Baixa os pesos do detector YOLO e do captioner Florence-2:
+### 3. Download OmniParser V2 Model Weights
+Downloads the YOLO icon detector and Florence-2 captioner weights into `models\omniparser`:
 ```cmd
 scripts\download_models.bat
 ```
 
-### 4. Baixar os Modelos de Linguagem (Qwen)
-Escolha o modelo de acordo com a capacidade da sua GPU:
-- **Qwen 3.5 4B (Recomendado para GPUs com 8 GB VRAM):**
+### 4. Download Language Models (Qwen)
+Choose based on your available VRAM:
+- **Qwen 3.5 4B (Recommended for 8 GB VRAM GPUs):**
   ```cmd
   scripts\download_qwen4b.bat
   ```
-- **Qwen 3.5 9B (Melhor raciocínio, para GPUs com 12 GB+ VRAM):**
+- **Qwen 3.5 9B (Stronger reasoning, for 12 GB+ VRAM GPUs):**
   ```cmd
   scripts\download_qwen9b.bat
   scripts\download_qwen9b_vision.bat
   ```
 
-### 5. Baixar as Engines Binárias Pré-compiladas
+### 5. Fetch Pre-built CUDA Binaries
 ```cmd
 scripts\fetch_llama_cuda.bat
 scripts\fetch_whisper_cuda.bat
 scripts\download_whisper_model.bat
 ```
 
-### 6. Compilar a Shell (Tauri Desktop)
+### 6. Build the Desktop Shell (Tauri)
 ```cmd
 scripts\build_shell.bat
 ```
 
 ---
 
-## 🏃 Como Executar
+## 🏃 Usage & Execution
 
-Após o build, inicie o executável gerado:
+Launch the compiled release executable:
 
 ```cmd
 shell\target\release\omni-all.exe
 ```
 
-Ao iniciar:
-1. A barra de comando flutuante surgirá no topo da tela.
-2. O `llama-server` e o `agent server` serão inicializados automaticamente em segundo plano.
-3. Digite sua instrução (ex: *"Abra o bloco de notas, digite 'Olá Mundo' e salve o arquivo na área de trabalho"*) e pressione `Enter`.
+When started:
+1. The floating command bar will appear on your screen.
+2. `llama-server` and the Python `agent server` will start automatically in the background.
+3. Type your command (e.g., *"Open Notepad, write 'Hello World' and save the file to the Desktop"*) and hit `Enter`.
 
-### ⚙️ Configurações Opcionais (`settings.json`)
+### ⚙️ Optional Configuration (`settings.json`)
 
-Você pode criar um arquivo `settings.json` na raiz para customizar os parâmetros:
+Create a `settings.json` file in the root folder to customize inference parameters:
 
 ```json
 {
@@ -213,23 +213,23 @@ Você pode criar um arquivo `settings.json` na raiz para customizar os parâmetr
 
 ---
 
-## 🤝 Contribuições
+## 🤝 Contributing
 
-Contribuições são muito bem-vindas! Se você tem ideias para:
-- Suporte a novos modelos VLM (ex: Qwen2.5-VL nativo, MiniCPM, Llama-Vision).
-- Otimização do pipeline de OCR e redução de latência no OmniParser.
-- Integrações em nuvem e orquestração de múltiplos agentes.
-- Suporte a múltiplos monitores e melhorias de usabilidade na UI.
+Contributions from the open-source community are highly encouraged! Areas of interest include:
+- Native support for new VLM architectures (e.g., Qwen2.5-VL native, MiniCPM-V).
+- OCR throughput optimizations and latency reduction in the parsing loop.
+- Multi-monitor coordinate scaling and dynamic DPI support.
+- Cloud orchestration adapters and multi-agent coordination.
 
-Sinta-se à vontade para:
-1. Fazer um Fork do projeto.
-2. Criar uma branch para sua funcionalidade (`git checkout -b feature/minha-melhoria`).
-3. Fazer o commit das suas alterações (`git commit -m 'feat: Adiciona suporte a XYZ'`).
-4. Fazer o push da branch (`git push origin feature/minha-melhoria`).
-5. Abrir um **Pull Request**.
+To contribute:
+1. Fork the project.
+2. Create a feature branch (`git checkout -b feature/amazing-feature`).
+3. Commit your changes (`git commit -m 'feat: Add support for amazing feature'`).
+4. Push to the branch (`git push origin feature/amazing-feature`).
+5. Open a **Pull Request**.
 
 ---
 
-## 📄 Licença
+## 📄 License
 
-Distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para obter mais informações.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more details.
