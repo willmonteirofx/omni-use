@@ -1,7 +1,7 @@
 # 🖥️ Omni-Use: Local Desktop Computer Use Agent
 
 > **100% Local Autonomous Computer Use Agent for Windows**  
-> Intelligent mouse and keyboard automation powered by computer vision, quantized local LLMs/VLMs, and real-time multilingual OCR.
+> Intelligent mouse and keyboard automation powered by computer vision, quantized local LLMs/VLMs, **JEV decision-native verification**, and real-time multilingual OCR.
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Omni-Use** is an autonomous desktop automation platform (*Computer Use*) that runs **100% locally** on Windows workstations. No screenshots, credentials, or user data are ever uploaded to cloud servers or third-party APIs.
 
-Unlike browser-only automation tools limited to DOM trees, Omni-Use analyzes physical desktop screens through **hybrid computer vision (OmniParser V2)**, detects interactable UI elements and bounding boxes, reasons over decisions with **local language and vision models (Qwen via llama.cpp)**, and drives the operating system natively and safely using **Win32 SendInput**.
+Unlike browser-only automation tools limited to DOM trees, Omni-Use analyzes physical desktop screens through **hybrid computer vision (OmniParser V2)**, detects interactable UI elements and bounding boxes, reasons over decisions with **local language and vision models (Qwen via llama.cpp)**, gates critical actions using **JEV (OpenJev) decision-native verification**, and drives the operating system natively and safely using **Win32 SendInput**.
 
 ```
    ┌────────────────────────────────────────────────────────┐
@@ -33,9 +33,10 @@ Unlike browser-only automation tools limited to DOM trees, Omni-Use analyzes phy
                                │ Proposed action
                                ▼
    ┌────────────────────────────────────────────────────────┐
-   │             OpenJev decide() Safety Gate               │
+   │             JEV (OpenJev) decide() Safety Gate         │
    │  - Logit probability check for destructive actions     │
    │  - Semantic validation of task completion ("done")     │
+   │  - Zero-generation instant forward pass                │
    └───────────────────────────┬────────────────────────────┘
                                │ Approved action
                                ▼
@@ -52,9 +53,12 @@ Unlike browser-only automation tools limited to DOM trees, Omni-Use analyzes phy
 
 - 👁️ **Local Computer Vision (OmniParser V2):** Accurately identifies buttons, icons, and input fields across any Windows application without requiring accessibility trees or source code.
 - 🧠 **Local LLM/VLM Reasoning:** Native GPU-accelerated execution via `llama-server` (CUDA 12.4), supporting Qwen text and multimodal vision projectors (`mmproj`).
+- ⚡ **JEV (OpenJev) Decision-Native Gating:**
+  - **Zero-Generation Verification:** Evaluates semantic conditions and action risks (`decide()`) in a single forward pass over token logit probabilities without generating text or incurring token latency.
+  - **Task Completion Proof:** Uses JEV verification to confirm that a claimed "done" state actually corresponds to what is rendered on screen before concluding the run.
 - 🛡️ **Active Safety & Mouse Guard:**
   - **Human Conflict Detection:** Moving the mouse manually for 1 second instantly pauses the agent, yielding control back to the user.
-  - **Destructive Action Gate (`decide`):** High-risk actions (e.g., delete, close without saving, send, purchase) require explicit user approval.
+  - **Destructive Action Gate:** High-risk actions (e.g., delete, close without saving, send, purchase) are intercepted and held for explicit user approval.
 - 🪟 **Floating Lightweight UI (Tauri v2):** Minimalist translucent command bar, status indicators, and an animated cursor badge excluded from screen capture (`WDA_EXCLUDEFROMCAPTURE`).
 - 🎯 **Target Window Confinement (`OMNI_CONFINE_TITLE`):** Ability to restrict all clicks, typing, and keystrokes exclusively to a specific window during testing.
 - 🎙️ **Local Voice Input:** Fast offline speech-to-text integration powered by `whisper.cpp` (`large-v3-turbo`).
@@ -66,10 +70,10 @@ Unlike browser-only automation tools limited to DOM trees, Omni-Use analyzes phy
 ```
 omni-use/
 ├── agent/                  # Python Sidecar (Core Agent Engine)
-│   ├── core.py             # Main Computer Use loop, Safety Gate & Action execution
+│   ├── core.py             # Main Computer Use loop, JEV Safety Gate & Action execution
 │   ├── vision.py           # Screen capture, OCR extraction, and OmniParser parsing
 │   ├── control.py          # Mouse & keyboard emulation via Win32 SendInput
-│   ├── llm_client.py       # HTTP client for llama.cpp (Chat, Vision & decide)
+│   ├── llm_client.py       # HTTP client for llama.cpp (Chat, Vision & JEV decide())
 │   ├── server.py           # Local HTTP server (port 8766) communicating with the Shell
 │   └── config.py           # Configuration, ports, and environment variables
 ├── omniparser/             # Official Microsoft OmniParser submodule
@@ -90,10 +94,11 @@ omni-use/
 
 ## 🤖 Models, Engines & Credits
 
-Omni-Use builds upon state-of-the-art open-source AI models and native runtime engines:
+Omni-Use builds upon state-of-the-art open-source AI models, research patterns, and native runtime engines:
 
 | Component | Role | Creator / Source | Original License |
 | :--- | :--- | :--- | :--- |
+| **JEV (OpenJev)** | Decision-native semantic gating & verification pattern | [JEV / OpenJev Architecture](https://github.com/willmonteirofx/omni-use) | MIT |
 | **OmniParser V2** | Screen UI parsing & parsing pipeline | [Microsoft Research](https://github.com/microsoft/OmniParser) | MIT |
 | **Florence-2** | Semantic icon captioning | [Microsoft](https://huggingface.co/microsoft/Florence-2-base) | MIT |
 | **YOLOv8** (Detector) | Bounding box icon detector | [Ultralytics](https://github.com/ultralytics/ultralytics) | AGPL-3.0 / Commercial |
@@ -115,7 +120,7 @@ The core codebase of **Omni-Use** is released under the **[MIT License](LICENSE)
 1. **Open-Source & Community Contributions:**
    - The project is fully open for community forks, bug fixes, enhancements, and custom integrations.
 2. **Permissive Upstream Engines (MIT / Apache 2.0):**
-   - The majority of underlying components (Tauri, llama.cpp, Whisper, Florence-2, EasyOCR, PaddleOCR, Qwen) use highly permissive licenses suitable for commercial products, cloud hosting, and SaaS infrastructure.
+   - The majority of underlying components (JEV, Tauri, llama.cpp, Whisper, Florence-2, EasyOCR, PaddleOCR, Qwen) use highly permissive licenses suitable for commercial products, cloud hosting, and SaaS infrastructure.
 3. **Ultralytics YOLO (AGPL-3.0) Notice:**
    - Microsoft OmniParser V2 relies on `ultralytics` for its icon detector. Under the **AGPL-3.0** license, if you host a modified backend service or distribute closed-source binaries over a network, AGPL copyleft terms may apply.
    - **For enterprise commercialization or closed-source cloud backends**, you can:
