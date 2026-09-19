@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>omni-all cursor</title>
+    <link rel="stylesheet" href="theme.css" />
+    <style>
+      /* 120x120 click-through window centered on the cursor (main.rs). */
+      html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+      .spinner {
+        position: absolute; left: 74px; top: 74px; width: 26px; height: 26px;
+        border-radius: 50%; background: var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,.25);
+        display: grid; place-items: center;
+      }
+      .spinner::before {
+        content: ""; width: 14px; height: 14px; border-radius: 50%;
+        border: 2.5px solid var(--surface-2); border-top-color: var(--accent);
+        animation: spin .7s linear infinite;
+      }
+      .ripple {
+        position: absolute; left: 60px; top: 60px; width: 0; height: 0; border-radius: 50%;
+        border: 2px solid var(--accent); transform: translate(-50%, -50%);
+        animation: ripple .5s ease-out forwards;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes ripple {
+        from { width: 6px; height: 6px; opacity: 1; }
+        to { width: 64px; height: 64px; opacity: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="spinner"></div>
+    <script>
+      window.__TAURI__.event.listen("ripple", () => {
+        const r = document.createElement("div");
+        r.className = "ripple";
+        document.body.append(r);
+        r.addEventListener("animationend", () => r.remove());
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+/* Shared look for every Omni Use window: white surfaces, black Lucide
+   icons, soft grays, rounded shapes. */
+:root {
+  --bg: #ffffff;
+  --surface: #f6f6f6;
+  --surface-2: #eeeeee;
+  --border: #e2e2e2;
+  --text: #111111;
+  --muted: #666666;
+  --accent: #111111;
+  --success-bg: #dcf5e3;
+  --success: #13632f;
+  --warn-bg: #fff1cc;
+  --warn: #7a5200;
+  --danger-bg: #fde0dd;
+  --danger: #9b1c12;
+  --radius: 14px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.icon-btn {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: var(--surface-2);
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.icon-btn.small {
+  width: 26px;
+  height: 26px;
+}
+
+.icon-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d6d6d6;
+  border-radius: 999px;
+  background: var(--bg);
+  padding: 5px 12px;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.text-btn:hover {
+  background: var(--surface-2);
+}
+
+.text-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge.success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.badge.uncertain,
+.badge.running {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.badge.failed,
+.badge.stopped {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.meter {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.meter > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.spin {
+  display: flex;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>omni-all debug</title>
+    <style>
+      /* Click-through overlay covering the primary monitor (main.rs): draws
+         OmniParser's boxes where the elements are, the chosen one in red. */
+      html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+      .box { position: absolute; border: 1.5px solid rgba(0, 150, 255, 0.85); box-sizing: border-box; }
+      .box.text { border-color: rgba(0, 190, 90, 0.85); }
+      .box span {
+        position: absolute; left: -1px; top: -15px; padding: 0 3px; font: 600 10px/14px system-ui, sans-serif;
+        color: #fff; background: rgba(0, 150, 255, 0.9);
+      }
+      .box.text span { background: rgba(0, 170, 80, 0.9); }
+      .box.target { border: 3px solid #ff2d2d; box-shadow: 0 0 0 3px rgba(255, 45, 45, 0.35); }
+      .box.target span { background: #ff2d2d; font-size: 12px; line-height: 16px; top: -19px; white-space: nowrap; }
+    </style>
+  </head>
+  <body>
+    <script>
+      const AGENT = "http://127.0.0.1:8766";
+      let shown = "";
+
+      async function poll() {
+        try {
+          const d = await (await fetch(AGENT + "/debug")).json();
+          const key = `${d.seq}|${d.certainty}`;
+          if (d.boxes && key !== shown) {
+            shown = key;
+            draw(d);
+          }
+        } catch {}
+        setTimeout(poll, 300);
+      }
+
+      // Boxes come in physical screen pixels; the page is in CSS pixels.
+      function draw(d) {
+        const k = 1 / window.devicePixelRatio;
+        document.body.replaceChildren(
+          ...d.boxes.map((b) => {
+            const el = document.createElement("div");
+            const target = b.id === d.target;
+            el.className = `box ${b.type}${target ? " target" : ""}`;
+            const [x1, y1, x2, y2] = b.box;
+            Object.assign(el.style, { left: `${x1 * k}px`, top: `${y1 * k}px`, width: `${(x2 - x1) * k}px`, height: `${(y2 - y1) * k}px` });
+            const label = document.createElement("span");
+            label.textContent = target
+              ? `${b.id} ${d.action}${d.certainty == null ? "" : ` · certeza ${Math.round(d.certainty * 100)}%`}`
+              : b.id;
+            el.append(label);
+            return el;
+          }),
+        );
+      }
+      poll();
+    </script>
+  </body>
+</html>

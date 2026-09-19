@@ -1,0 +1,27 @@
+# omni-all Python environment (agent + OmniParser V2).
+# torch/torchvision are NOT listed here: they come from PyTorch's CUDA
+# index, installed first by scripts\install_agent.bat.
+
+# --- OmniParser V2 (omniparser/util) ---
+# Pins follow what omniparser/util needs: utils.py builds a PaddleOCR at
+# import time with the 2.x API (use_gpu=...), and the Florence-2 caption
+# model's remote code breaks on newer transformers.
+easyocr
+paddlepaddle==2.6.2
+paddleocr==2.9.1
+supervision==0.18.0
+transformers==4.49.0
+ultralytics==8.3.70
+huggingface_hub
+numpy==1.26.4
+opencv-python
+timm
+einops==0.8.0
+accelerate
+openai==1.3.5
+matplotlib
+
+# --- omni-all agent ---
+mss
+pillow
+requests

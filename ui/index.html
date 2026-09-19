@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <title>omni-all</title>
+    <link rel="stylesheet" href="theme.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="card">
+      <div id="settings" class="section" hidden>
+        <div class="result-head">
+          <b>Configurações</b>
+          <span class="grow"></span>
+          <button class="icon-btn small" data-icon="x" id="settings-close" title="Fechar"></button>
+        </div>
+        <div id="settings-body"></div>
+      </div>
+
+      <div id="status" class="section" hidden>
+        <span id="status-icon" class="spin" data-icon="loader"></span>
+        <div class="status-text">
+          <div id="status-title"></div>
+          <div id="status-detail" class="muted"></div>
+        </div>
+        <span id="status-steps" class="muted"></span>
+      </div>
+
+      <div id="result" class="section" hidden>
+        <div class="result-head">
+          <span id="result-badge" class="badge"></span>
+          <span class="grow"></span>
+          <button class="icon-btn small" data-icon="copy" id="copy" title="Copiar"></button>
+          <button class="icon-btn small" data-icon="x" id="result-close" title="Fechar"></button>
+        </div>
+        <div id="result-text"></div>
+      </div>
+
+      <div class="pill">
+        <span id="grip" class="grip" data-icon="grip-vertical" title="Arraste para mover"></span>
+        <button id="mic" class="icon-btn" data-icon="mic" title="Falar (Whisper local)"></button>
+        <input id="command" type="text" placeholder="Carregando modelos..." autocomplete="off" disabled />
+        <button id="debug" class="icon-btn" data-icon="eye" title="Debug visual do OmniParser"></button>
+        <button id="gear" class="icon-btn" data-icon="settings" title="Configurações"></button>
+        <button id="stop" class="icon-btn" data-icon="square" title="Parar" hidden></button>
+        <button id="control" class="icon-btn" data-icon="send" title="Enviar" disabled></button>
+        <button id="quit" class="icon-btn small" data-icon="x" title="Fechar omni-all"></button>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
